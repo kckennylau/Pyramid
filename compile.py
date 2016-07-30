@@ -57,7 +57,6 @@ def exec_code(stack, line):
                 output.append(pointer)
                 outputcheck = False
             else:
-                print(code[stack + 1])
                 if ["o"] in code[stack + 1]:
                     finaloutput.append("".join(output))
                 output = [pointer]
