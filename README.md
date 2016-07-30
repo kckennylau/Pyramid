@@ -23,3 +23,11 @@ Added commands:
 - `r`: Removes stored inputs made by `?`.
 
 `o`, `a` and `r` have to be in the first line of the applied stack to work.
+
+To launch Pyramid code, you have to paste the code into file.pmd (you can edit .pmd files using something like Notepad).
+You also need:
+- Python (I'm fairly sure either version is fine)
+- `colorama` (do `pip install colorama` on Windows or `python -m pip install colorama` on Bash).
+
+TODO:
+- Make custom file names a "thing"
