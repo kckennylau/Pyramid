@@ -1,6 +1,8 @@
 # Pyramid
 Pyramid: An stack-based esoteric language.
 
+~~Built on top on~~ Heavily inspired by [Stackylogic](http://codegolf.stackexchange.com/questions/84851/run-stackylogic).
+
 In Pyramid, there are eight commands:
 
 - `0`: Move the pointer up one place in the stack.
