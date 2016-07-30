@@ -12,7 +12,7 @@ finaloutput = []
 errors = [x for x in open("errors.txt", "r").read().split("\n")]
 
 # Initialise code.
-codestart = open("file.sl", "r").read().split("\n")
+codestart = open("file.slp", "r").read().split("\n")
 code = [x for x in ("/" + "/".join(codestart) + "/").split("-")]
 
 for a in range(len(code)):
