@@ -1,0 +1,5 @@
+Invalid symbol was found.
+No code after '-' symbol.
+Input can only be 0 or 1.
+Multiple '<' symbols were found.
+'i' was called on stack 1.
