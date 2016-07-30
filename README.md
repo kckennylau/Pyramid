@@ -17,7 +17,7 @@ Added commands:
 
 - `-`: Break between stacks.
 - - `i`: Uses previous inputs.
-  - If there are less "i" 'prompts' than inputs stored, a new prompt will appear (the `i` will be treated as a `?`).
+  - If there are less `i` 'prompts' than inputs stored, a new prompt will appear (the `i` will be treated as a `?`).
 - `o`: Appends the output of the previous stack to current stack's output.
 - `a`: `o` command, and converts the final binary number to decimal, then to ASCII.
 - `r`: Removes stored inputs made by `?`.
