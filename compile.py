@@ -9,14 +9,16 @@ outputcheck = False
 asciicheck = False
 output = []
 finaloutput = []
+
+inputs = []
+inputscheck = 0
+
 errors = [x for x in open("errors.txt", "r").read().split("\n")]
 
 # Initialise code.
-codestart = open("file.pmd", "r").read().split("\n")
+codestart = open("file.sl", "r").read().split("\n")
 code = [x for x in ("/" + "/".join(codestart) + "/").split("-")]
 
-for a in range(len(code)):
-    code[a] = code[a].split("/")
 
 # Declares errors.
 def call_error(errorno, stack, line):
@@ -26,12 +28,20 @@ def call_error(errorno, stack, line):
           ("stack " + str(stack + 1)) * stackcheck + ("line " + str(line + 1) + ")") * linecheck + ")" * stackcheck)
     sys.exit()
 
+for a in range(len(code)):
+    code[a] = code[a].split("/")
+    if code[a] == []:
+        call_error(1, "none", "none")
+
+
+# Executes code on the pointer of the current stack.
 def exec_code(stack, line):
+    global inputscheck
     runcode = code[stack][line]
     try:
         pointer = runcode[len(runcode) - 1]
     except IndexError:
-        global pointer, output, outputcheck, opstartcheck, asciicheck
+        global pointer, output, outputcheck, asciicheck
         if stack + 1 == len(code):
             if outputcheck is True:
                 output.append(pointer)
@@ -65,8 +75,23 @@ def exec_code(stack, line):
         if prompt not in ["0", "1"]:
             call_error(2, "none", "none")
         else:
+            inputs.append(prompt)
             code[stack][line] = runcode[:len(runcode) - 1] + prompt
             exec_code(stack, line)
+    elif pointer == "i":
+        try:
+            code[stack][line] = runcode[:len(runcode) - 1] + inputs[inputscheck]
+        except IndexError:
+            prompt = raw_input(">>>")
+            if prompt not in ["0", "1"]:
+                call_error(2, "none", "none")
+            else:
+                inputs.append(prompt)
+                code[stack][line] = runcode[:len(runcode) - 1] + prompt
+        inputscheck += 1
+        exec_code(stack, line)
+    else:
+        call_error(0, stack, line)
 
 
 # Finds "<" symbol, and initiates code there.
@@ -83,10 +108,15 @@ def find_marker(stack):
         call_error(3, stack, realstart)
     exec_code(stack, realstart)
 
+
 # Finds "o" and "a" symbols, and does things accordingly.
 def find_chars(stack):
-    global outputcheck, opstartcheck, asciicheck
+    global inputs, inputscheck, outputcheck, asciicheck
     for chars in range(1, len(code[stack]) - 1):
+        if "r" in code[stack][chars]:
+            inputs = []
+            inputscheck = 0
+            code[stack][chars] = code[stack][chars][1:]
         if "o" == code[stack][chars]:
             outputcheck = True
             code[stack] = [code[stack][0]] + code[stack][2:]
