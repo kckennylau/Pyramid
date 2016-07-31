@@ -5,10 +5,11 @@ init()
 
 # Variables.
 pointer = ""
-outputcheck = False
-asciicheck = False
-output = []
-finaloutput = []
+modes = {"":0, "o":1, "a":2, "p":3}
+mode = -1
+output = ""
+start = True
+buffer = [0,""]
 
 inputs = []
 inputscheck = 0
@@ -36,37 +37,36 @@ for a in range(len(code)):
 
 # Executes code on the pointer of the current stack.
 def exec_code(stack, line):
-    global inputscheck
+    global pointer,modes,mode,output,buffer,start
     runcode = code[stack][line]
     try:
         pointer = runcode[len(runcode) - 1]
     except IndexError:
-        global pointer, output, outputcheck, asciicheck
         if stack + 1 == len(code):
-            if outputcheck is True:
-                output.append(pointer)
-                finaloutput.append("".join(output))
+            buffer[0] = (buffer[0]<<1) | int(pointer)
+            buffer[1] += pointer
+            if mode == modes["a"]:
+                output += chr(buffer[0])
             else:
-                finaloutput.append(pointer)
-            if asciicheck is True:
-                finaloutput[len(finaloutput) - 1] = chr(int(finaloutput[len(finaloutput) - 1], 2))
-            print("Output: " + "".join(finaloutput))
+                output += buffer[1]
+            print("Output: " + output)
             sys.exit()
         else:
-            if outputcheck is True:
-                output.append(pointer)
-                outputcheck = False
+            if mode == modes[""]:
+                if not start:
+                    output += buffer[1]
+                buffer = [int(pointer),pointer]
+            elif mode == modes["a"]:
+                buffer[0] = (buffer[0]<<1) | int(pointer)
+                buffer[1] += pointer
+                output += chr(buffer[0])
+                buffer = [0,""]
             else:
-                print(code[stack + 1])
-                if ["o"] in code[stack + 1]:
-                    finaloutput.append("".join(output))
-                output = [pointer]
-            if asciicheck is True:
-                finaloutput.append("".join(output))
-                output = [pointer]
-                finaloutput[len(finaloutput) - 1] = chr(int(finaloutput[len(finaloutput) - 1], 2))
-                asciicheck = False
+                buffer[0] = (buffer[0]<<1) | int(pointer)
+                buffer[1] += pointer
+            start = False
             find_chars(stack + 1)
+        start = False
     if pointer in ["0", "1"]:
         code[stack][line] = runcode[:len(runcode) - 1]
         exec_code(stack, line - ((2 * int(pointer)) - 1))
@@ -111,19 +111,21 @@ def find_marker(stack):
 
 # Finds "o" and "a" symbols, and does things accordingly.
 def find_chars(stack):
-    global inputs, inputscheck, outputcheck, asciicheck
-    for chars in range(1, len(code[stack]) - 1):
-        if "r" in code[stack][chars]:
-            inputs = []
-            inputscheck = 0
-            code[stack][chars] = code[stack][chars][1:]
-        if "o" == code[stack][chars]:
-            outputcheck = True
-            code[stack] = [code[stack][0]] + code[stack][2:]
-        elif "a" == code[stack][chars]:
-            outputcheck = True
-            asciicheck = True
-            code[stack] = [code[stack][0]] + code[stack][2:]
+    global pointer,modes,mode,output,buffer
+    if "r" in code[stack][1]:
+        inputs = []
+        inputscheck = 0
+        code[stack][1] = code[stack][1].replace("r","")
+    number = code[stack][1].count("p")
+    for _ in range(number):
+        buffer[0] = (buffer[0]<<1) | (buffer[0]&1)
+        buffer[1] += buffer[1][-1]
+    code[stack][1] = code[stack][1].replace("p","")
+    try:
+        mode = modes[code[stack][1]]
+        code[stack] = [code[stack][0]] + code[stack][2:]
+    except KeyError:
+        mode = modes[""]
     find_marker(stack)
 
 find_chars(0)
